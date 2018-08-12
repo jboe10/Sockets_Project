@@ -1,10 +1,19 @@
 import socket
 import threading
 
+class msg:
+
+    def __init__(self, msg, from_address):
+        self.msg = msg
+        self.from_address = from_address
+
+
 class ThreadedServer(object):
     def __init__(self, host, port):
         self.host = "localhost"
         self.port = port
+        self.client_list = []
+        self.msg_queue = []
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.sock.bind((self.host, self.port))
@@ -18,23 +27,49 @@ class ThreadedServer(object):
             threading.Thread(target = self.listenToClient,args = (client,address)).start()
 
     def listenToClient(self, client, address):
+
+        # Append client address to list of current clients
+        self.client_list.append(address[1])
+
+        # set the response to echo back data about client
         size = 1024
-        #while True:
-        data = "username = " + str(address[1])
-          
-                # Set the response to echo back the recieved data 
-        response = data
+        response = "username = " + str(address[1])
         client.send(response.encode('ascii'))
         print("Username assigned")
-        #else:
-        #       raise error('Client disconnected')
 
+        # spin recieveing message and add to msg que
         recieved = ""
-
         while recieved != "exit()":
+
+            # Take in messages from all clients and add to msg_queue
             recieved = str(client.recv(1024), "utf-8")
+            messge = msg(recieved, address)
+            self.msg_queue.append(messge)
+
+            # Print Message to server Console
             print(str(address[1]) + ": " +recieved)
+
+            #Broadcast message back to all clients
+            #broadcast_msg(client, address[1])
+
+        #remove client from client list then close client
         client.close()
+
+        print(self.client_list)
+        while self.msg_queue:
+            pop = self.msg_queue.pop(0)
+            print(pop.msg)
+
+
+
+    def broadcast_msg(client):
+        while self.msg_queue:
+            pop = queue.pop(0)
+            for i in self.client_list:
+                if i != pop.form_address:
+                    message = pop.from_address + ": " + pop.msg
+                    client.send(pop.msg.encode('ascii'))
+
 
 
 if __name__ == "__main__":
