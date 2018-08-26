@@ -1,23 +1,25 @@
-import socket 
+import sys
+from PyQt5.QtWidgets import QDialog, QApplication, QMainWindow
+from chatUI import Ui_MainWindow
 
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-host = socket.gethostname()
+import chatUI
+import Threaded_client
 
-port = 9999
+class AppWindow(QDialog):
+	def __init__(self):
+		super().__init__()
+		self.ui = Ui_MainWindow()
+		self.ui.setupUi(self)
+		self.show()
 
-
-# connect to the server on local computer
-s.connect((host, port))
-
-# receive data from the server
-msg = s.recv(1024)
-print(msg.decode('ascii'))
-
-var = ""
-while var != "exit()":
-	var = input(': ')
-	s.send(var.encode('ascii'))
+		self.client = Threaded_client()
 
 
-# close the connection
-s.close()
+app = QApplication(sys.argv)
+MainWindow = QMainWindow()
+
+ui = Ui_MainWindow()
+ui.setupUi(MainWindow)
+
+MainWindow.show()
+sys.exit(app.exec_())

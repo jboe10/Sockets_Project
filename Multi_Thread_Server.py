@@ -22,6 +22,7 @@ class ThreadedServer(object):
         self.sock.listen(5)
         while True:
             client, address = self.sock.accept()
+            self.client_list.append(client)
             print("got connection from" + str(address))
             client.settimeout(60)
             threading.Thread(target = self.listenToClient,args = (client,address)).start()
@@ -29,7 +30,7 @@ class ThreadedServer(object):
     def listenToClient(self, client, address):
 
         # Append client address to list of current clients
-        self.client_list.append(address[1])
+       
 
         # set the response to echo back data about client
         size = 1024
@@ -50,7 +51,7 @@ class ThreadedServer(object):
             print(str(address[1]) + ": " +recieved)
 
             #Broadcast message back to all clients
-            #broadcast_msg(client, address[1])
+            self.broadcast_msg(client)
 
         #remove client from client list then close client
         client.close()
@@ -62,13 +63,13 @@ class ThreadedServer(object):
 
 
 
-    def broadcast_msg(client):
+    def broadcast_msg(self, client):
         while self.msg_queue:
-            pop = queue.pop(0)
-            for i in self.client_list:
-                if i != pop.form_address:
-                    message = pop.from_address + ": " + pop.msg
-                    client.send(pop.msg.encode('ascii'))
+            pop = self.msg_queue.pop(0)
+            for i in range(0,len(self.client_list)):
+                if self.client_list[i] != client:
+                    message = str(pop.from_address) + ": " + pop.msg + "\n"
+                    self.client_list[i].send(message.encode('ascii'))
 
 
 
