@@ -38,13 +38,14 @@ class ThreadedServer(object):
         client.send(response.encode('ascii'))
         print("Username assigned")
 
+        """
         # spin recieveing message and add to msg que
-        recieved = ""
-        while recieved != "exit()":
+        recieved = []
+        while recieved:
 
             # Take in messages from all clients and add to msg_queue
-            recieved = str(client.recv(1024), "utf-8")
-            messge = msg(recieved, address)
+            recieved.append(str(client.recv(1024), "utf-8"))
+            messge = msg(recieved.pop(0), address)
             self.msg_queue.append(messge)
 
             # Print Message to server Console
@@ -52,34 +53,45 @@ class ThreadedServer(object):
 
             #Broadcast message back to all clients
             self.broadcast_msg(client)
+            print("ffff")
 
         #remove client from client list then close client
-        client.close()
+        """
+        # Take in messages from all clients and add to msg_queue
+        recieved = ""
+        while recieved != "exit()":
+            recieved = (str(client.recv(1024), "utf-8"))
+           
+            if recieved != "":
+                messge = msg(recieved, address)
+                self.msg_queue.append(messge)
 
+                print(str(address[1]) + ": " +recieved)
+
+                self.broadcast_msg(client)
+                #client.send(recieved.encode('ascii'))
+
+
+
+        #client.close()
+        """
         print(self.client_list)
-        while self.msg_queue:
+        while len(self.msg_queue) > 1:
             pop = self.msg_queue.pop(0)
             print(pop.msg)
+        """
 
-
-
+    
     def broadcast_msg(self, client):
         while self.msg_queue:
             pop = self.msg_queue.pop(0)
             for i in range(0,len(self.client_list)):
-                if self.client_list[i] != client:
-                    message = str(pop.from_address) + ": " + pop.msg + "\n"
-                    self.client_list[i].send(message.encode('ascii'))
+                message = str(pop.from_address) + ": " + pop.msg + "\n"
+                self.client_list[i].send(message.encode('ascii'))
+                print("Sent that shit back yo")
 
 
 
 if __name__ == "__main__":
-    while True:
-        port_num = input("Port? ")
-        try:
-            port_num = int(port_num)
-            break
-        except ValueError:
-            pass
 
-    ThreadedServer('',port_num).listen()
+    ThreadedServer('',9999).listen()

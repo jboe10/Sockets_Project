@@ -55,7 +55,7 @@ class Ui_MainWindow(object):
 
 
         ##################### Button Click Actions ############################
-        self.sendBtn.clicked.connect(self.addItem)
+        #self.sendBtn.clicked.connect(self.addItem)
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
@@ -63,12 +63,13 @@ class Ui_MainWindow(object):
         self.sendBtn.setText(_translate("MainWindow", "Send"))
         self.connectButton.setText(_translate("MainWindow", "Connect"))
         self.disconnectButton.setText(_translate("MainWindow", "Disconnect"))
-
+    """
     def addItem(self):
         value = self.lineEdit.text()
         self.lineEdit.clear()
         self.listWidget.addItem(value)
-
+    """
+"""
 if __name__ == "__main__":
     import sys
     app = QtWidgets.QApplication(sys.argv)
@@ -78,3 +79,4 @@ if __name__ == "__main__":
     MainWindow.show()
     sys.exit(app.exec_())
 
+"""
